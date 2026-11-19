@@ -11,6 +11,8 @@ const router = express.Router();
 router.use(auth(UserRole.ADMIN));
 
 router.get("/", userControllers.getAllUsers);
+// Declared before "/:id" so "interests" is not read as a user ID
+router.get("/interests", userControllers.groupByInterests);
 router.post("/", validateRequest(UserValidation.createUserSchema), userControllers.createUser);
 router.get("/:id", userControllers.getUserById);
 router.patch("/:id", validateRequest(UserValidation.updateUserSchema), userControllers.updateUser);

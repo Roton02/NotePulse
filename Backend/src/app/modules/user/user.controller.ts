@@ -15,6 +15,17 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const groupByInterests = catchAsync(async (req: Request, res: Response) => {
+  const { groups, meta } = await userServices.groupByInterests(req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Users grouped by interests",
+    meta,
+    data: groups,
+  });
+});
+
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.createUser(req.body);
   sendResponse(res, {
@@ -56,6 +67,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 
 export const userControllers = {
   getAllUsers,
+  groupByInterests,
   createUser,
   getUserById,
   updateUser,

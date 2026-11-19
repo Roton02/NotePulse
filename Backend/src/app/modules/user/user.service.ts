@@ -18,6 +18,37 @@ const listUsers = async (query: { page?: unknown; limit?: unknown }) => {
   return { users, meta: buildMeta(page, limit, total) };
 };
 
+// Users grouped by interest, one group per interest, biggest groups first.
+// Uses a single User.aggregate() call; the $facet stage returns the page and the total together.
+const groupByInterests = async (query: { page?: unknown; limit?: unknown }) => {
+  const { page, limit, skip } = getPagination(query);
+
+  const [result] = await User.aggregate([
+    { $unwind: "$interests" },
+    {
+      $group: {
+        _id: "$interests",
+        count: { $sum: 1 },
+        users: { $push: { _id: "$_id", name: "$name", email: "$email" } },
+      },
+    },
+    { $sort: { count: -1, _id: 1 } },
+    {
+      $facet: {
+        groups: [
+          { $skip: skip },
+          { $limit: limit },
+          { $project: { _id: 0, interest: "$_id", count: 1, users: 1 } },
+        ],
+        total: [{ $count: "count" }],
+      },
+    },
+  ]);
+
+  const total = result?.total[0]?.count ?? 0;
+  return { groups: result?.groups ?? [], meta: buildMeta(page, limit, total) };
+};
+
 const createUser = async (payload: Partial<IUser>) => {
   return await User.create({
     name: payload.name,
@@ -72,6 +103,7 @@ const deleteUser = async (id: string, requesterId: string) => {
 
 export const userServices = {
   listUsers,
+  groupByInterests,
   createUser,
   getUserById,
   updateUser,
