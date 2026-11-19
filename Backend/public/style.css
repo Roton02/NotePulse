@@ -1,0 +1,18 @@
+body { font-family: system-ui, sans-serif; margin: 0; padding: 0 16px 40px; color: #222; }
+header { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #ddd; }
+header h1 { font-size: 1.4rem; margin: 0; }
+header span { flex: 1; color: #555; }
+main { max-width: 760px; margin: 0 auto; }
+form { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
+input, textarea, select { flex: 1 1 200px; padding: 6px; font: inherit; }
+textarea { min-height: 60px; }
+button { padding: 6px 12px; font: inherit; cursor: pointer; }
+.item { border: 1px solid #ddd; padding: 8px 10px; margin: 6px 0; }
+.item small { color: #666; }
+.item p { margin: 4px 0; white-space: pre-wrap; }
+.item button { margin-right: 6px; }
+.pager { display: flex; align-items: center; gap: 8px; margin: 6px 0 18px; }
+.msg { min-height: 1.2em; }
+.msg.error { color: #b00020; }
+.msg.ok { color: #1b5e20; }
+[hidden] { display: none !important; }

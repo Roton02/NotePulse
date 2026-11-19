@@ -1,4 +1,5 @@
 import cors from "cors";
+import path from "path";
 import express, { Application, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import httpStatus from "http-status";
@@ -22,6 +23,9 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1", router);
+
+// Minimal plain frontend (public/index.html, app.js, style.css)
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use(GlobalErrorHandler);
 

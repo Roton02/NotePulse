@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NotePulse</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>NotePulse</h1>
+    <span id="who"></span>
+    <button id="logout-btn" type="button" hidden>Log out</button>
+  </header>
+
+  <main>
+    <p id="global-msg" class="msg"></p>
+
+    <section id="auth-section">
+      <h2>Log in</h2>
+      <form id="login-form">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button type="submit">Log in</button>
+      </form>
+
+      <h2>Register</h2>
+      <form id="register-form">
+        <input name="name" placeholder="Name" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password (8+ characters)" required>
+        <input name="interests" placeholder="Interests, comma separated (e.g. chess, reading)">
+        <button type="submit">Register</button>
+      </form>
+    </section>
+
+    <section id="app-section" hidden>
+      <h2>My notes</h2>
+      <form id="note-form">
+        <input type="hidden" name="id">
+        <input name="title" placeholder="Title" required maxlength="200">
+        <textarea name="content" placeholder="Content" maxlength="10000"></textarea>
+        <button type="submit" id="note-save">Create note</button>
+        <button type="button" id="note-cancel" hidden>Cancel edit</button>
+      </form>
+      <div id="notes"></div>
+      <div class="pager" data-pager="notes"></div>
+
+      <h2>Write a post</h2>
+      <form id="post-form">
+        <input name="title" placeholder="Title" required maxlength="200">
+        <textarea name="body" placeholder="Body" required maxlength="5000"></textarea>
+        <button type="submit">Publish</button>
+      </form>
+
+      <h2>Posts by user</h2>
+      <form id="user-posts-form">
+        <input name="userId" placeholder="User ID" required>
+        <button type="submit">Show posts</button>
+      </form>
+      <div id="user-posts"></div>
+      <div class="pager" data-pager="userPosts"></div>
+
+      <section id="admin-section" hidden>
+        <h2>Admin: users</h2>
+        <form id="user-form">
+          <input type="hidden" name="id">
+          <input name="name" placeholder="Name">
+          <input name="email" type="email" placeholder="Email">
+          <input name="password" type="password" placeholder="Password (required for new user)">
+          <select name="role">
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+          </select>
+          <input name="interests" placeholder="Interests, comma separated">
+          <button type="submit" id="user-save">Create user</button>
+          <button type="button" id="user-cancel" hidden>Cancel edit</button>
+        </form>
+        <div id="users"></div>
+        <div class="pager" data-pager="users"></div>
+
+        <h2>Admin: all notes</h2>
+        <div id="all-notes"></div>
+        <div class="pager" data-pager="allNotes"></div>
+
+        <h2>Admin: users grouped by interest</h2>
+        <div id="groups"></div>
+        <div class="pager" data-pager="groups"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
