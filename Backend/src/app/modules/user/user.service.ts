@@ -1,24 +1,21 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiErrors";
-import { IPaginationOptions } from "../../../interfaces/paginations";
+import { buildMeta, getPagination } from "../../../shared/pagination";
 import { IUser, UserRole } from "./user.interface";
 import { User } from "./user.model";
 
-const MAX_LIMIT = 50;
-
-const listUsers = async ({ page = 1, limit = 10 }: IPaginationOptions) => {
-  const safePage = Math.max(1, Math.floor(page));
-  const safeLimit = Math.min(MAX_LIMIT, Math.max(1, Math.floor(limit)));
+const listUsers = async (query: { page?: unknown; limit?: unknown }) => {
+  const { page, limit, skip } = getPagination(query);
 
   const [users, total] = await Promise.all([
     User.find()
       .sort({ createdAt: -1 })
-      .skip((safePage - 1) * safeLimit)
-      .limit(safeLimit),
+      .skip(skip)
+      .limit(limit),
     User.countDocuments(),
   ]);
 
-  return { users, meta: { page: safePage, limit: safeLimit, total } };
+  return { users, meta: buildMeta(page, limit, total) };
 };
 
 const createUser = async (payload: Partial<IUser>) => {
