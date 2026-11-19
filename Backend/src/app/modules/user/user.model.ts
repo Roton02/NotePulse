@@ -1,7 +1,9 @@
+import bcrypt from "bcryptjs";
 import { model, Schema } from "mongoose";
-import { IUser, UserRole } from "./user.interface";
+import config from "../../../config";
+import { IUser, IUserMethods, UserModel, UserRole } from "./user.interface";
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     name: {
       type: String,
@@ -16,9 +18,10 @@ const userSchema = new Schema<IUser>(
       lowercase: true,
       maxlength: 254,
     },
+    // Hidden by default; query with .select("+password") when it is needed
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
       select: false,
     },
     role: {
@@ -26,11 +29,35 @@ const userSchema = new Schema<IUser>(
       enum: Object.values(UserRole),
       default: UserRole.USER,
     },
+    interests: {
+      type: [{ type: String, trim: true, lowercase: true, maxlength: 30 }],
+      default: [],
+      validate: {
+        validator: (interests: string[]) => interests.length <= 20,
+        message: "A user can have at most 20 interests",
+      },
+    },
   },
   { timestamps: true }
 );
 
+// Login lookup and uniqueness of accounts. This is the only index the user model needs.
 userSchema.index({ email: 1 }, { unique: true });
+
+// Admin user list, newest first (paginated)
+userSchema.index({ createdAt: -1 });
+
+// Hash the password whenever it is set or changed, so it is never stored in plain text
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+  this.password = await bcrypt.hash(this.password, config.bcrypt_salt_rounds);
+});
+
+userSchema.methods.comparePassword = async function (candidatePassword: string) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 userSchema.set("toJSON", {
   transform: (_doc, ret: any) => {
@@ -40,4 +67,4 @@ userSchema.set("toJSON", {
   },
 });
 
-export const User = model<IUser>("User", userSchema);
+export const User = model<IUser, UserModel>("User", userSchema);

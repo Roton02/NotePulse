@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import config from "../../config";
 import { UserRole } from "../modules/user/user.interface";
@@ -10,6 +9,7 @@ export const connectDB = async (): Promise<void> => {
 };
 
 // Creates the super admin from env vars only if no admin user exists yet.
+// The User model hashes the password on save, so the raw password is passed here.
 export const seedSuperAdmin = async (): Promise<void> => {
   const { name, email, password } = config.super_admin;
 
@@ -29,14 +29,7 @@ export const seedSuperAdmin = async (): Promise<void> => {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, config.bcrypt_salt_rounds);
-
-    await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role: UserRole.ADMIN,
-    });
+    await User.create({ name, email, password, role: UserRole.ADMIN });
 
     console.log("🦸 Super admin created successfully");
   } catch (error) {
