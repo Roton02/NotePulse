@@ -35,6 +35,7 @@ export interface Meta {
   total: number;
 }
 
+// One row of the admin "users by interest" view
 export interface Group {
   interest: string;
   count: number;

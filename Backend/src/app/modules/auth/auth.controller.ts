@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { authServices } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
 import catchAsync from "../../../shared/catchAsync";
+import { INTERESTS } from "../user/user.constants";
 
 const register = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.register(req.body);
@@ -24,6 +25,15 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getInterests = catchAsync(async (_req: Request, res: Response) => {
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Interests retrieved successfully",
+    data: [...INTERESTS],
+  });
+});
+
 const me = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.getMe(req.user.id);
   sendResponse(res, {
@@ -38,4 +48,5 @@ export const authControllers = {
   register,
   login,
   me,
+  getInterests,
 };

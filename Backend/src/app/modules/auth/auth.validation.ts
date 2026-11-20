@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { INTERESTS } from "../user/user.constants";
 
 const emailSchema = z
   .string({ required_error: "Email is required" })
@@ -20,11 +21,15 @@ const registerSchema = z.object({
     .string({ required_error: "Password is required" })
     .min(8, "Password must be at least 8 characters")
     .max(72, "Password must be at most 72 characters"),
+  // Users pick from the fixed list; any other value is rejected
   interests: z
-    .array(z.string().trim().min(1).max(30), {
-      invalid_type_error: "Interests must be an array of strings",
-    })
-    .max(20, "A user can have at most 20 interests")
+    .array(
+      z.enum(INTERESTS, {
+        errorMap: () => ({ message: "Choose interests from the list" }),
+      }),
+      { invalid_type_error: "Interests must be a list" }
+    )
+    .max(INTERESTS.length, "Too many interests")
     .optional(),
 });
 

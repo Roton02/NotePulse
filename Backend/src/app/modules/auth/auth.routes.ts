@@ -22,6 +22,8 @@ router.post(
   validateRequest(AuthValidation.loginSchema),
   authControllers.login
 );
+// Public list the registration form uses
+router.get("/interests", authControllers.getInterests);
 router.get("/me", auth(), authControllers.me);
 
 export const authRoutes = router;

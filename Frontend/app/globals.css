@@ -55,3 +55,12 @@ td.actions button { margin-right: 6px; padding: 4px 8px; }
   .form-grid { grid-template-columns: 1fr; }
   .form-grid .span-2 { grid-column: span 1; }
 }
+
+/* Interest picker on the registration form */
+fieldset.interests { border: 1px solid #ddd; border-radius: 4px; padding: 8px 10px; margin: 0; }
+fieldset.interests legend { font-size: 0.9rem; padding: 0 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid #aaa; border-radius: 14px; cursor: pointer; font-size: 0.9rem; text-transform: capitalize; }
+.chip input { margin: 0; }
+.chip.on { background: #222; color: #fff; border-color: #222; }
+.chip.on input { accent-color: #fff; }
