@@ -110,6 +110,7 @@ Posts are visible to everyone.
 | Method | Path             | Auth | Description                                         |
 | ------ | ---------------- | ---- | --------------------------------------------------- |
 | POST   | `/`              | yes  | Create a post `{ title, body }`                     |
+| GET    | `/`              | no   | Public feed: all posts, newest first (paginated)    |
 | GET    | `/user/:userId`  | no   | All posts by one user, newest first (paginated)     |
 
 ### Users (`/api/v1/users`, admin only)
@@ -133,7 +134,7 @@ Passwords are never returned in responses.
 
 ## Indexes
 
-All indexes are defined with `schema.index`. There are five, and each one supports a specific query:
+All indexes are defined with `schema.index`. There are six, and each one supports a specific query:
 
 | Collection | Index                   | Used by                                  |
 | ---------- | ----------------------- | ---------------------------------------- |
@@ -142,6 +143,7 @@ All indexes are defined with `schema.index`. There are five, and each one suppor
 | notes      | `{ owner: 1, createdAt: -1 }` | a user's own notes, newest first   |
 | notes      | `{ createdAt: -1 }`     | admin list of all notes, newest first    |
 | posts      | `{ user: 1, createdAt: -1 }`  | a user's posts (`$match` and `$sort`) |
+| posts      | `{ createdAt: -1 }`     | public feed, newest first                |
 
 Lookups by `_id` (single note, single user) use MongoDB's built-in `_id` index. The interest grouping scans the whole users collection with no filter, so no extra index would help it, and none was added.
 

@@ -14,6 +14,46 @@ const createPost = async (authorId: string, payload: Partial<IPost>) => {
   });
 };
 
+// Public feed: all posts, newest first, paginated. Each post carries its author's id and name.
+const getAllPosts = async (query: { page?: unknown; limit?: unknown }) => {
+  const { page, limit, skip } = getPagination(query);
+
+  const [posts, total] = await Promise.all([
+    Post.aggregate([
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "users",
+          let: { authorId: "$user" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_id", "$$authorId"] } } },
+            { $project: { _id: 0, name: 1 } },
+          ],
+          as: "author",
+        },
+      },
+      // Keep the post even if its author was deleted; the name then becomes null
+      { $unwind: { path: "$author", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          body: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          user: 1,
+          author: { $ifNull: ["$author.name", null] },
+        },
+      },
+    ]),
+    Post.countDocuments(),
+  ]);
+
+  return { posts, meta: buildMeta(page, limit, total) };
+};
+
 // All posts of one user, newest first, paginated.
 // One aggregation pipeline with a $lookup stage adds the author's name to each post.
 const getPostsByUser = async (userId: string, query: { page?: unknown; limit?: unknown }) => {
@@ -54,6 +94,7 @@ const getPostsByUser = async (userId: string, query: { page?: unknown; limit?: u
           body: 1,
           createdAt: 1,
           updatedAt: 1,
+          user: 1,
           author: "$author.name",
         },
       },
@@ -66,5 +107,6 @@ const getPostsByUser = async (userId: string, query: { page?: unknown; limit?: u
 
 export const postServices = {
   createPost,
+  getAllPosts,
   getPostsByUser,
 };

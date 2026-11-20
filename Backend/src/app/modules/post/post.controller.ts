@@ -14,6 +14,17 @@ const createPost = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllPosts = catchAsync(async (req: Request, res: Response) => {
+  const { posts, meta } = await postServices.getAllPosts(req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Posts retrieved successfully",
+    meta,
+    data: posts,
+  });
+});
+
 const getPostsByUser = catchAsync(async (req: Request, res: Response) => {
   const { posts, meta } = await postServices.getPostsByUser(req.params.userId, req.query);
   sendResponse(res, {
@@ -27,5 +38,6 @@ const getPostsByUser = catchAsync(async (req: Request, res: Response) => {
 
 export const postControllers = {
   createPost,
+  getAllPosts,
   getPostsByUser,
 };

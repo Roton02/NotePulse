@@ -22,3 +22,5 @@ button.active { background: #222; color: #fff; }
 small { color: #666; display: block; margin: 4px 0; }
 .error { color: #b00020; }
 .ok { color: #1b5e20; }
+.muted { color: #777; }
+.sentinel { height: 1px; }

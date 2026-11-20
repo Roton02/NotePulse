@@ -20,8 +20,11 @@ export interface Note {
 
 export interface Post {
   _id: string;
+  // Author's user id (present on feed and author listings)
+  user?: string;
   title: string;
   body: string;
+  // Author's name, or null if the author account was deleted
   author: string | null;
   createdAt: string;
 }

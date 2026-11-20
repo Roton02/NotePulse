@@ -25,5 +25,7 @@ const postSchema = new Schema<IPost>(
 
 // A user's posts, newest first. Serves the $match and $sort of the user-posts aggregation.
 postSchema.index({ user: 1, createdAt: -1 });
+// Public feed, newest first
+postSchema.index({ createdAt: -1 });
 
 export const Post = model<IPost>("Post", postSchema);
