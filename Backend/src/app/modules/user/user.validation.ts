@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { UserRole } from "./user.interface";
+import { INTERESTS } from "./user.constants";
 
 const createUserSchema = z.object({
   name: z
@@ -21,10 +22,13 @@ const createUserSchema = z.object({
     errorMap: () => ({ message: "Role must be either user or admin" }),
   }).optional(),
   interests: z
-    .array(z.string().trim().min(1).max(30), {
-      invalid_type_error: "Interests must be an array of strings",
-    })
-    .max(20, "A user can have at most 20 interests")
+    .array(
+      z.enum(INTERESTS, {
+        errorMap: () => ({ message: "Choose interests from the list" }),
+      }),
+      { invalid_type_error: "Interests must be a list" }
+    )
+    .max(INTERESTS.length, "Too many interests")
     .optional(),
 });
 

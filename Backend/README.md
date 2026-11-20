@@ -89,8 +89,9 @@ Send the token as `Authorization: Bearer <token>`.
 | POST   | `/register` | no   | `{ name, email, password, interests? }`           |
 | POST   | `/login`    | no   | `{ email, password }`                             |
 | GET    | `/me`       | yes  | —                                                 |
+| GET    | `/interests` | no   | The fixed list of interests users can choose      |
 
-`register` and `login` return `{ user, token }`. Both are rate limited to 20 requests per 15 minutes per IP.
+`register` and `login` return `{ user, token }`. `interests` must come from the list `GET /auth/interests` returns (currently chess, reading, music, sports, travel, cooking, gaming, art, coding, movies). Any other value is rejected with 400. Both are rate limited to 20 requests per 15 minutes per IP.
 
 ### Notes (`/api/v1/notes`)
 
@@ -124,7 +125,7 @@ Posts are visible to everyone.
 | PATCH  | `/:id`        | Update `name`, `email`, `password`, `role` or `interests` |
 | DELETE | `/:id`        | Delete a user                                            |
 
-Passwords are never returned in responses.
+Passwords are never returned in responses. Interests on create and update must come from the same fixed list.
 
 ## Aggregations
 

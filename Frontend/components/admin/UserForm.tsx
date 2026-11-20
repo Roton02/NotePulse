@@ -1,10 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { api, errorMessage } from "@/lib/api";
-import { User } from "@/lib/types";
-
-const parseList = (text: string) => text.split(",").map((s) => s.trim()).filter(Boolean);
+import { ApiEnvelope, User } from "@/lib/types";
 
 interface UserFormProps {
   editing: User | null;
@@ -18,13 +16,29 @@ export default function UserForm({ editing, onSaved, onCancel }: UserFormProps) 
     email: editing?.email ?? "",
     password: "",
     role: editing?.role ?? "user",
-    interests: (editing?.interests ?? []).join(", "),
   });
+  // Fixed choices from the server. When editing, a user's older free-text interests are
+  // shown too, so they can be unchecked.
+  const [options, setOptions] = useState<string[]>([]);
+  const [chosen, setChosen] = useState<string[]>(editing?.interests ?? []);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    api
+      .get<ApiEnvelope<string[]>>("/auth/interests")
+      .then(({ data }) => {
+        const extra = (editing?.interests ?? []).filter((i) => !data.result.includes(i));
+        setOptions([...data.result, ...extra]);
+      })
+      .catch(() => setOptions(editing?.interests ?? []));
+  }, [editing]);
+
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) =>
     setForm({ ...form, [key]: e.target.value });
+
+  const toggle = (interest: string) =>
+    setChosen((prev) => (prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest]));
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,11 +47,10 @@ export default function UserForm({ editing, onSaved, onCancel }: UserFormProps) 
     try {
       if (editing) {
         // Send only what was filled in. An empty password keeps the current one.
-        const body: Record<string, unknown> = { role: form.role };
+        const body: Record<string, unknown> = { role: form.role, interests: chosen };
         if (form.name) body.name = form.name;
         if (form.email) body.email = form.email;
         if (form.password) body.password = form.password;
-        if (form.interests) body.interests = parseList(form.interests);
         await api.patch(`/users/${editing._id}`, body);
         onSaved("User updated");
       } else {
@@ -46,7 +59,7 @@ export default function UserForm({ editing, onSaved, onCancel }: UserFormProps) 
           email: form.email,
           password: form.password,
           role: form.role,
-          interests: parseList(form.interests),
+          interests: chosen,
         });
         onSaved("User created");
       }
@@ -86,10 +99,17 @@ export default function UserForm({ editing, onSaved, onCancel }: UserFormProps) 
             <option value="admin">admin</option>
           </select>
         </label>
-        <label className="span-2">
-          Interests (comma separated)
-          <input value={form.interests} onChange={set("interests")} placeholder="chess, reading" />
-        </label>
+        <fieldset className="interests span-2">
+          <legend>Interests</legend>
+          <div className="chips">
+            {options.map((interest) => (
+              <label key={interest} className={chosen.includes(interest) ? "chip on" : "chip"}>
+                <input type="checkbox" checked={chosen.includes(interest)} onChange={() => toggle(interest)} />
+                {interest}
+              </label>
+            ))}
+          </div>
+        </fieldset>
       </div>
       <div className="row">
         <button type="submit" disabled={busy}>
