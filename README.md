@@ -96,7 +96,7 @@ npm run dev
 
 3. Open http://localhost:3000 in your browser.
 
-The frontend sends its requests to the backend on port 5000. To use another backend address set the `BACKEND_URL` variable before you start the frontend.
+By default the frontend uses the hosted backend at https://note-pulse-three.vercel.app. To use a local backend set the `BACKEND_URL` variable to http://localhost:5000 before you start the frontend.
 
 ## First login
 

@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 // Forwards /api/v1 calls to the backend, so the browser never makes a cross-origin request
-const backend = process.env.BACKEND_URL || "http://localhost:5000";
+// Base address only (no /api/v1). Set BACKEND_URL to use a different backend, e.g. http://localhost:5000
+const backend = process.env.BACKEND_URL || "https://note-pulse-three.vercel.app";
 
 const nextConfig: NextConfig = {
   async rewrites() {
