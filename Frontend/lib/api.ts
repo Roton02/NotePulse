@@ -41,4 +41,4 @@ export function errorMessage(err: unknown): string {
   return "Something went wrong";
 }
 
-export const PAGE_SIZE = 5;
+export const PAGE_SIZE = 10;
