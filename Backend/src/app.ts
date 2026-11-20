@@ -6,6 +6,7 @@ import httpStatus from "http-status";
 import config from "./config";
 import router from "./app/routes";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
+import { connectDB } from "./app/DB";
 
 const app: Application = express();
 
@@ -17,6 +18,16 @@ app.use(
 );
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// Make sure the database is connected before any API route runs
+app.use("/api", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.get("/health", (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({ success: true, message: "API is running" });

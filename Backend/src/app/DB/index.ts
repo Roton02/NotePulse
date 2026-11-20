@@ -3,9 +3,25 @@ import config from "../../config";
 import { UserRole } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
 
+// Opens the database connection once and reuses it. Safe to call many times.
+// Serverless hosts (Vercel) may run the app without server.ts, so requests also call this.
+let connecting: Promise<typeof mongoose> | null = null;
+
 export const connectDB = async (): Promise<void> => {
-  await mongoose.connect(config.mongo_uri);
-  console.log(`✅ MongoDB connected: ${mongoose.connection.host}`);
+  if (mongoose.connection.readyState === 1) return;
+  if (!connecting) {
+    connecting = mongoose
+      .connect(config.mongo_uri, { serverSelectionTimeoutMS: 8000 })
+      .then((conn) => {
+        console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+        return conn;
+      })
+      .catch((err) => {
+        connecting = null; // allow a retry on the next request
+        throw err;
+      });
+  }
+  await connecting;
 };
 
 // Creates the super admin from env vars only if no admin user exists yet.
